@@ -7,3 +7,4 @@ export {default as Order} from './Order';
 export {default as Payment} from './Payment';
 export {default as Ticket} from './Ticket';
 export {default as Profile} from './Profile';
+export {default as OrderHistory} from './OrderHistory';

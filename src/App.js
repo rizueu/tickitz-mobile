@@ -21,6 +21,7 @@ import {
   Payment,
   Ticket,
   Profile,
+  OrderHistory,
 } from './Screens';
 
 export default function App() {
@@ -95,6 +96,13 @@ export default function App() {
             <Stack.Screen
               component={Profile}
               name="Profile"
+              options={{
+                header: () => <Header />,
+              }}
+            />
+            <Stack.Screen
+              component={OrderHistory}
+              name="OrderHistory"
               options={{
                 header: () => <Header />,
               }}

@@ -47,6 +47,7 @@ const Navbar = styled.View`
   justify-content: space-between;
   align-items: center;
   padding: 20px;
+  background-color: #fff;
 `;
 
 const Avatar = styled.Image`
