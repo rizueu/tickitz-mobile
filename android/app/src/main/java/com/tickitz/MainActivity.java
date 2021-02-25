@@ -1,6 +1,8 @@
 package com.tickitz;
 
 import com.facebook.react.ReactActivity;
+import com.zoontek.rnbootsplash.RNBootSplash;
+import android.os.Bundle;
 
 public class MainActivity extends ReactActivity {
 
@@ -12,4 +14,8 @@ public class MainActivity extends ReactActivity {
   protected String getMainComponentName() {
     return "Tickitz";
   }
+  protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        RNBootSplash.init(R.drawable.bootsplash, MainActivity.this);
+    }
 }

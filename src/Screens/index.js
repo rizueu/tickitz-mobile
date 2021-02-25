@@ -6,3 +6,4 @@ export {default as MovieDetail} from './MovieDetail';
 export {default as Order} from './Order';
 export {default as Payment} from './Payment';
 export {default as Ticket} from './Ticket';
+export {default as Profile} from './Profile';

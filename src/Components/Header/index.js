@@ -1,35 +1,45 @@
-import React, {Component} from 'react';
-import {Image, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
+import React from 'react';
+import {Image, TouchableOpacity} from 'react-native';
+import {connect} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 import styled from 'styled-components';
 
 import Icon from 'react-native-vector-icons/Feather';
 import PrimaryLogo from '../../Assets/Icons/Tickitz_Primary.png';
 
-export default class Header extends Component {
-  constructor(props) {
-    super(props);
-  }
+const Header = (props) => {
+  const navigation = useNavigation();
 
-  render() {
-    return (
-      <Navbar>
-        <TouchableOpacity>
-          <Image
-            style={{resizeMode: 'contain', width: 120, height: 40}}
-            source={PrimaryLogo}
+  return (
+    <Navbar>
+      <TouchableOpacity>
+        <Image
+          style={{resizeMode: 'contain', width: 120, height: 40}}
+          source={PrimaryLogo}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+        {!props.token ? (
+          <Avatar
+            source={{
+              uri: 'https://reactnative.dev/img/tiny_logo.png',
+            }}
           />
-        </TouchableOpacity>
-        {this.props.auth ? (
-          <></>
         ) : (
-          <TouchableWithoutFeedback>
-            <Icon name="menu" size={24} />
-          </TouchableWithoutFeedback>
+          <Icon name="menu" size={24} />
         )}
-      </Navbar>
-    );
-  }
-}
+      </TouchableOpacity>
+    </Navbar>
+  );
+};
+
+const mapStateToProps = (state) => {
+  return {
+    token: state.auth.token,
+  };
+};
+
+export default connect(mapStateToProps)(Header);
 
 const Navbar = styled.View`
   display: flex;
@@ -37,4 +47,10 @@ const Navbar = styled.View`
   justify-content: space-between;
   align-items: center;
   padding: 20px;
+`;
+
+const Avatar = styled.Image`
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
 `;

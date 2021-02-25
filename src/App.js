@@ -4,6 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {StatusBar} from 'react-native';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
+import RNBootSplash from 'react-native-bootsplash';
 
 import persistedStore from './Redux/store';
 
@@ -19,10 +20,16 @@ import {
   Order,
   Payment,
   Ticket,
+  Profile,
 } from './Screens';
 
 export default function App() {
   const {persistor, store} = persistedStore();
+
+  React.useEffect(() => {
+    RNBootSplash.hide({fade: true});
+  }, []);
+
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
@@ -81,6 +88,13 @@ export default function App() {
             <Stack.Screen
               component={Ticket}
               name="Ticket"
+              options={{
+                header: () => <Header />,
+              }}
+            />
+            <Stack.Screen
+              component={Profile}
+              name="Profile"
               options={{
                 header: () => <Header />,
               }}
