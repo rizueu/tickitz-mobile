@@ -5,6 +5,7 @@ import {StatusBar} from 'react-native';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import RNBootSplash from 'react-native-bootsplash';
+import FlashMessage from 'react-native-flash-message';
 
 import persistedStore from './Redux/store';
 
@@ -38,10 +39,10 @@ export default function App() {
           <StatusBar barStyle="light-content" />
           <Stack.Navigator>
             <Stack.Screen
-              component={SignUp}
-              name="SignUp"
+              component={Home}
+              name="Home"
               options={{
-                header: () => <Header auth />,
+                header: () => <Header />,
               }}
             />
             <Stack.Screen
@@ -59,10 +60,10 @@ export default function App() {
               }}
             />
             <Stack.Screen
-              component={Home}
-              name="Home"
+              component={SignUp}
+              name="SignUp"
               options={{
-                header: () => <Header />,
+                header: () => <Header auth />,
               }}
             />
             <Stack.Screen
@@ -108,6 +109,7 @@ export default function App() {
               }}
             />
           </Stack.Navigator>
+          <FlashMessage position="top" />
         </NavigationContainer>
       </PersistGate>
     </Provider>

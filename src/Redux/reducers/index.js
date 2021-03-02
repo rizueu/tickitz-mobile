@@ -4,13 +4,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import hardSet from 'redux-persist/lib/stateReconciler/hardSet';
 
 // Import All Reducer
+import mainReducer from './main';
 import authReducer from './auth';
 import moviesReducer from './movies';
+import showtimesReducer from './showtimes';
+import orderReducer from './order';
+import userReducer from './user';
 
 const rootPersistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  blacklist: ['auth'],
+  blacklist: ['auth', 'movies', 'showtimes', 'order', 'user'],
 };
 
 const authPersistConfig = {
@@ -19,9 +23,23 @@ const authPersistConfig = {
   stateReconciler: hardSet,
 };
 
+const userPersistConfig = {
+  key: 'user',
+  storage: AsyncStorage,
+};
+
+const orderPersistConfig = {
+  key: 'order',
+  storage: AsyncStorage,
+};
+
 const rootReducer = combineReducers({
+  main: mainReducer,
   auth: persistReducer(authPersistConfig, authReducer),
   movies: moviesReducer,
+  showtimes: showtimesReducer,
+  order: persistReducer(orderPersistConfig, orderReducer),
+  user: persistReducer(userPersistConfig, userReducer),
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

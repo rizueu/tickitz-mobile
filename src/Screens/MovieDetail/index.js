@@ -161,12 +161,11 @@ export class MovieDetail extends Component {
               </PriceSection>
               <View style={{flex: 1}}>
                 <ButtonSection>
-                  <Button style={{paddingVertical: 10}} variant="primary">
-                    <Text
-                      onPress={() => this.props.navigation.navigate('Order')}
-                      white>
-                      Book now
-                    </Text>
+                  <Button
+                    onPress={() => this.props.navigation.navigate('Order')}
+                    style={{paddingVertical: 10}}
+                    variant="primary">
+                    <Text white>Book now</Text>
                   </Button>
                   <Button style={{paddingVertical: 10}}>
                     <Text primary>Add to cart</Text>

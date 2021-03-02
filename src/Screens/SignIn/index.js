@@ -1,92 +1,170 @@
-import React from 'react';
-import {View, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
+import {showMessage} from 'react-native-flash-message';
 
-import {Button, Separator} from '../../Components';
+import {useNavigation} from '@react-navigation/native';
+import {Button, Separator, Loading} from '../../Components';
+import {useSelector, useDispatch} from 'react-redux';
+
+import {login} from '../../Redux/actions/auth';
+import {setLoading} from '../../Redux/actions/main';
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const SignIn = (props) => {
+const SignIn = () => {
+  const [peekPassword, setPeekPassword] = useState(true);
+  // const error = useSelector((state) => state.auth.errorMsg);
+
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  function showPassword() {
+    if (peekPassword === false) {
+      setPeekPassword(true);
+    } else {
+      setPeekPassword(false);
+    }
+  }
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email('Please enter valid email')
+      .required('Email Address is Required'),
+    password: Yup.string()
+      .min(5, 'Password length must be at least 5 Characters')
+      .required('Password is required'),
+  });
+
+  const submitHandler = (body) => {
+    const {email, password} = body;
+    dispatch(setLoading());
+    dispatch(login(email, password));
+    setTimeout(() => {
+      showMessage({
+        message: 'Successfuly Sign In.',
+        type: 'success',
+        duration: 3000,
+        hideOnPress: true,
+      });
+      navigation.navigate('Home');
+    }, 3000);
+  };
+
   return (
-    <Container>
-      <Text style={{fontSize: 25, marginVertical: 20}} heavy>
-        Sign In
-      </Text>
-      <Formik
-        initialValues={{
-          email: '',
-          password: '',
-        }}
-        onSubmit={(values) => {
-          props.navigation.navigate('Home');
-        }}>
-        {({handleChange, handleBlur, handleSubmit, values}) => {
-          return (
-            <React.Fragment>
-              <InputGroup>
-                <Label>Email</Label>
-                <Input
-                  style={{paddingHorizontal: 20}}
-                  onChangeText={handleChange('email')}
-                  onBlur={handleBlur('email')}
-                  value={values.email}
-                  placeholder="Write your email"
-                  keyboardType="email-address"
-                />
-              </InputGroup>
-              <InputGroup>
-                <Label>Password</Label>
-                <Input
-                  style={{paddingHorizontal: 20}}
-                  onChangeText={handleChange('password')}
-                  onBlur={handleBlur('password')}
-                  value={values.password}
-                  placeholder="Write your password"
-                  secureTextEntry
-                />
-                <Icon name="eye" style={styles.eyeIcon} />
-              </InputGroup>
-              <Button
-                style={{paddingVertical: 15, marginTop: 30}}
-                variant="primary"
-                onPress={() => props.navigation.navigate('Home')}>
-                <Text white>Sign In</Text>
-              </Button>
-              <Text style={{marginTop: 20}} center gray>
-                Forgot your password?
-                <Text
-                  onPress={() => props.navigation.navigate('Forgot')}
-                  primary>
-                  {' '}
-                  Reset now
+    <ScrollView style={{backgroundColor: '#fff'}}>
+      <Container>
+        <Text style={{fontSize: 25, marginVertical: 20}} heavy>
+          Sign In
+        </Text>
+        <Formik
+          initialValues={{
+            email: '',
+            password: '',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={submitHandler}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            touched,
+            errors,
+            values,
+          }) => {
+            return (
+              <React.Fragment>
+                <InputGroup>
+                  <Label>Email</Label>
+                  <Input
+                    style={{paddingHorizontal: 20}}
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                    value={values.email}
+                    placeholder="Write your email"
+                    keyboardType="email-address"
+                  />
+                </InputGroup>
+                <InputGroup>
+                  <Label>Password</Label>
+                  <Input
+                    style={{paddingHorizontal: 20}}
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                    value={values.password}
+                    placeholder="Write your password"
+                    secureTextEntry={peekPassword}
+                  />
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      showPassword();
+                    }}>
+                    <Icon
+                      name={peekPassword ? 'eye' : 'eye-slash'}
+                      style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: 46,
+                        marginRight: 20,
+                        color: peekPassword ? '#888' : '#752EEA',
+                        fontSize: 16,
+                      }}
+                    />
+                  </TouchableWithoutFeedback>
+                </InputGroup>
+                {errors && touched && (
+                  <Text style={{color: 'red', marginTop: 10}} center>
+                    {errors.email ? errors.email : errors.password}
+                  </Text>
+                )}
+                <Button
+                  style={{paddingVertical: 15, marginTop: 30}}
+                  variant="primary"
+                  onPress={() => handleSubmit()}>
+                  <Text white>Sign In</Text>
+                </Button>
+                <Text style={{marginTop: 20}} center gray>
+                  Forgot your password?
+                  <Text onPress={() => navigation.navigate('Forgot')} primary>
+                    {' '}
+                    Reset now
+                  </Text>
                 </Text>
-              </Text>
-              <Separator>Or</Separator>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                }}>
-                <TouchableOpacity style={{marginRight: 60}}>
-                  <Image
-                    style={{resizeMode: 'contain'}}
-                    source={require('../../Assets/Icons/flat-color-icons_google.png')}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Image
-                    source={require('../../Assets/Icons/bx_bxl-facebook-circle.png')}
-                  />
-                </TouchableOpacity>
-              </View>
-            </React.Fragment>
-          );
-        }}
-      </Formik>
-    </Container>
+                <Separator>Or</Separator>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                  }}>
+                  <TouchableOpacity style={{marginRight: 60}}>
+                    <Image
+                      style={{resizeMode: 'contain'}}
+                      source={require('../../Assets/Icons/flat-color-icons_google.png')}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity>
+                    <Image
+                      source={require('../../Assets/Icons/bx_bxl-facebook-circle.png')}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </React.Fragment>
+            );
+          }}
+        </Formik>
+      </Container>
+      <Loading />
+    </ScrollView>
   );
 };
 

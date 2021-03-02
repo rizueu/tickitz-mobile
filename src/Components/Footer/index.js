@@ -109,6 +109,7 @@ const Footer = styled.View`
   display: flex;
   justify-content: space-between;
   padding: 20px;
+  background-color: #fff;
 `;
 
 const FooterItems = styled.View`

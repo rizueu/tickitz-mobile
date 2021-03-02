@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, TouchableOpacity, Image} from 'react-native';
+import {View, TouchableOpacity, Image, ScrollView} from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
@@ -8,42 +8,44 @@ import {Button, Separator} from '../../Components';
 
 const Forgot = (props) => {
   return (
-    <Container>
-      <Text style={{fontSize: 25, marginBottom: 10, marginTop: 20}} heavy>
-        Forgot Password
-      </Text>
-      <Text gray>we'll send a link to your email shortly</Text>
-      <Formik
-        initialValues={{
-          email: '',
-        }}
-        onSubmit={(values) => console.log(values)}>
-        {({handleChange, handleBlur, handleSubmit, values}) => {
-          return (
-            <React.Fragment>
-              <InputGroup>
-                <Label>Email</Label>
-                <Input
-                  style={{paddingHorizontal: 20}}
-                  onChangeText={handleChange('email')}
-                  onBlur={handleBlur('email')}
-                  value={values.email}
-                  placeholder="Write your email"
-                />
-              </InputGroup>
-              <Button
-                style={{paddingVertical: 15, marginTop: 30}}
-                onPress={handleSubmit}
-                variant="primary">
-                <Text onPress={() => props.navigation.navigate('Home')} white>
-                  Activate now
-                </Text>
-              </Button>
-            </React.Fragment>
-          );
-        }}
-      </Formik>
-    </Container>
+    <ScrollView style={{backgroundColor: '#fff'}}>
+      <Container>
+        <Text style={{fontSize: 25, marginBottom: 10, marginTop: 20}} heavy>
+          Forgot Password
+        </Text>
+        <Text gray>we'll send a link to your email shortly</Text>
+        <Formik
+          initialValues={{
+            email: '',
+          }}
+          onSubmit={(values) => console.log(values)}>
+          {({handleChange, handleBlur, handleSubmit, values}) => {
+            return (
+              <React.Fragment>
+                <InputGroup>
+                  <Label>Email</Label>
+                  <Input
+                    style={{paddingHorizontal: 20}}
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                    value={values.email}
+                    placeholder="Write your email"
+                  />
+                </InputGroup>
+                <Button
+                  style={{paddingVertical: 15, marginTop: 30}}
+                  onPress={handleSubmit}
+                  variant="primary">
+                  <Text onPress={() => props.navigation.navigate('Home')} white>
+                    Activate now
+                  </Text>
+                </Button>
+              </React.Fragment>
+            );
+          }}
+        </Formik>
+      </Container>
+    </ScrollView>
   );
 };
 
