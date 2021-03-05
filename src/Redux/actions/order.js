@@ -10,7 +10,7 @@ export const setOrder = (data) => {
     pricePerSeat: data.pricePerSeat,
     showTimeId: data.showTimeId,
     timeId: data.timeId,
-    cinemaId: data.cinemaId,
+    cinemaId: data.id,
     movieId: data.movieId,
     category: data.movieCategory,
   };

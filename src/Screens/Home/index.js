@@ -1,18 +1,22 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
-import {StyleSheet, ScrollView, View, Image} from 'react-native';
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Image,
+  ActivityIndicator,
+  Dimensions,
+} from 'react-native';
 import styled from 'styled-components';
 import moment from 'moment';
-
-// Import Assets
-import spiderMan from '../../Assets/Images/Movies/spiderMan.png';
 
 // Import Components
 import {Button, Footer} from '../../Components';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {getNowShowing, getUpComing} from '../redux/actions/movies';
-import {setLoading} from '../redux/actions/main';
+import {getNowShowing, getUpComing} from '../../Redux/actions/movies';
+import {setLoading} from '../../Redux/actions/main';
 
 function Home(props) {
   const token = useSelector((state) => state.auth.token);
@@ -32,8 +36,8 @@ function Home(props) {
   }, [token, navigation]);
 
   React.useEffect(() => {
-    getNowShowing(moment().format('MMMM'), dispatch);
-    getUpComing(selectedSeason, dispatch);
+    dispatch(getNowShowing(moment().format('MMMM')));
+    dispatch(getUpComing(selectedSeason));
   }, [selectedSeason, dispatch]);
 
   return (
@@ -84,10 +88,15 @@ function Home(props) {
                       })
                     }
                     key={String(index)}>
-                    <MovieImage source={e.picture} />
+                    <MovieImage
+                      source={{
+                        uri: e.picture,
+                      }}
+                    />
                   </NowShowingCard>
                 );
               })}
+              {nowShowingMovies.length === 0 && <Text>There is no films.</Text>}
             </ScrollView>
           </View>
         </Container>
@@ -125,11 +134,21 @@ function Home(props) {
               return (
                 <View key={String(index)} style={styled.button}>
                   {element === selectedSeason ? (
-                    <Button style={styles.UpcomingButton} variant="primary">
+                    <Button
+                      onPress={() => {
+                        dispatch(setLoading(false));
+                      }}
+                      style={styles.UpcomingButton}
+                      variant="primary">
                       <Text white>{element}</Text>
                     </Button>
                   ) : (
                     <Button
+                      onPress={() => {
+                        dispatch(setLoading(true));
+                        setSelectedSeason(element);
+                        setTimeout(() => dispatch(setLoading(false)), 1000);
+                      }}
                       style={styles.UpcomingButton}
                       variant="outlined-primary">
                       <Text primary>{element}</Text>
@@ -143,27 +162,50 @@ function Home(props) {
             style={{marginVertical: 20}}
             showsHorizontalScrollIndicator={false}
             horizontal={true}>
-            {upComingMovies.map((e, index) => {
-              return (
-                <UpcomingCard key={String(index)}>
-                  <MovieImage source={spiderMan} />
-                  <MovieDetail>
-                    <Text style={{fontSize: 15, marginBottom: 5}} center>
-                      Spider-Man: Homecoming
-                    </Text>
-                    <Text style={{fontSize: 12}} center gray>
-                      Action, Sci-Fi, Fantasy
-                    </Text>
-                  </MovieDetail>
-                  <Button
-                    onPress={() => navigation.navigate('MovieDetail')}
-                    style={{marginTop: 10, paddingVertical: 5}}
-                    variant="outlined-primary">
-                    <Text primary>Detail</Text>
-                  </Button>
-                </UpcomingCard>
-              );
-            })}
+            {loading ? (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 20,
+                  width: Dimensions.get('window').width,
+                }}>
+                <ActivityIndicator size="small" color="#5F2EEA" />
+              </View>
+            ) : upComingMovies.length > 0 ? (
+              upComingMovies.map((e, index) => {
+                return (
+                  <UpcomingCard key={String(index)}>
+                    <MovieImage
+                      source={{
+                        uri: e.picture,
+                      }}
+                    />
+                    <MovieDetail>
+                      <Text style={{fontSize: 15, marginBottom: 5}} center>
+                        {e.title}
+                      </Text>
+                      <Text style={{fontSize: 12}} center gray>
+                        {e.genres}
+                      </Text>
+                    </MovieDetail>
+                    <Button
+                      onPress={() =>
+                        navigation.navigate('MovieDetail', {
+                          movieId: e.id,
+                        })
+                      }
+                      style={{marginTop: 10, paddingVertical: 5}}
+                      variant="outlined-primary">
+                      <Text primary>Detail</Text>
+                    </Button>
+                  </UpcomingCard>
+                );
+              })
+            ) : (
+              <Text>There is no films.</Text>
+            )}
           </ScrollView>
         </View>
         <View style={{marginVertical: 45}}>
@@ -266,6 +308,7 @@ const UpcomingCard = styled.View`
 
 const MovieImage = styled.Image`
   width: 120px;
+  height: 180px;
   margin-bottom: 15px;
   border-radius: 5px;
 `;

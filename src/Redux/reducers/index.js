@@ -28,17 +28,12 @@ const userPersistConfig = {
   storage: AsyncStorage,
 };
 
-const orderPersistConfig = {
-  key: 'order',
-  storage: AsyncStorage,
-};
-
 const rootReducer = combineReducers({
   main: mainReducer,
   auth: persistReducer(authPersistConfig, authReducer),
   movies: moviesReducer,
   showtimes: showtimesReducer,
-  order: persistReducer(orderPersistConfig, orderReducer),
+  order: orderReducer,
   user: persistReducer(userPersistConfig, userReducer),
 });
 

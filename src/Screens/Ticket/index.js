@@ -1,11 +1,17 @@
 import React from 'react';
 import {Image, Text, ScrollView, StyleSheet, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import moment from 'moment';
+
 import success from '../../Assets/Icons/successTicket.png';
 import barCode from '../../Assets/Images/barcode.png';
 import Footer from '../../Components/Footer';
 
+import {useSelector, useDispatch} from 'react-redux';
+
 function Ticket() {
+  const results = useSelector((state) => state.order);
+
   return (
     <>
       <ScrollView>
@@ -35,37 +41,41 @@ function Ticket() {
             <View style={styles.rowTicketInfo}>
               <View style={styles.cardInfo}>
                 <Text style={styles.titleInfo}>Movie</Text>
-                <Text style={styles.textValue}>SpiderMan: Homecoming.</Text>
+                <Text style={styles.textValue}>{results.movieTitle}</Text>
               </View>
               <View style={styles.cardInfo}>
                 <Text style={styles.titleInfo}>Category</Text>
-                <Text style={styles.textValue}>PG-13</Text>
+                <Text style={styles.textValue}>{results.category}</Text>
               </View>
             </View>
             <View style={styles.rowTicketInfo}>
               <View style={styles.cardInfo}>
                 <Text style={styles.titleInfo}>Date</Text>
-                <Text style={styles.textValue}>07 Jul</Text>
+                <Text style={styles.textValue}>
+                  {moment(results.showTimeDate).format('dd MMMM')}
+                </Text>
               </View>
               <View style={styles.cardInfo}>
                 <Text style={styles.titleInfo}>Time</Text>
-                <Text style={styles.textValue}>2:00pm</Text>
+                <Text style={styles.textValue}>{results.ticketTime}</Text>
               </View>
             </View>
             <View style={styles.rowTicketInfo}>
               <View style={styles.cardInfo}>
                 <Text>Count</Text>
-                <Text style={styles.textValue}>3 pcs</Text>
+                <Text style={styles.textValue}>{results.ticketCount} pcs</Text>
               </View>
               <View style={styles.cardInfo}>
                 <Text>Seats</Text>
-                <Text style={styles.textValue}>C4, C5, C6</Text>
+                <Text style={styles.textValue}>{results.seats.join(', ')}</Text>
               </View>
             </View>
             <View style={styles.rowBtnTotal}>
               <TouchableOpacity style={styles.btnTotal}>
                 <Text>Total</Text>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>$30.00</Text>
+                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                  Rp.{results.totalPayment}.00
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

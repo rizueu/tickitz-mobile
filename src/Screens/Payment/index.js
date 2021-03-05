@@ -1,9 +1,17 @@
 import React, {Component} from 'react';
 import styled from 'styled-components/native';
-import Button from '../../component/Button';
-import {InputText} from '../../component/Form';
+import http from '../../Helpers/http';
 import {View} from 'native-base';
 import {TouchableOpacity} from 'react-native';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+import {showMessage} from 'react-native-flash-message';
+import Button from '../../component/Button';
+import {InputText, InputPhone} from '../../component/Form';
+
+import {connect} from 'react-redux';
+import {setPersonalInfo, setPaymentMethod} from '../../Redux/actions/order';
+import {setLoading} from '../../Redux/actions/main';
 
 // Import Payment Method
 import gpay from '../../Assets/Images/Payment/g-pay.png';
@@ -17,9 +25,20 @@ import paypal from '../../Assets/Images/Payment/paypal.png';
 
 import warning from '../../Assets/Icons/warning.png';
 
-import {Footer} from '../../Components';
+import {Footer, Loading} from '../../Components';
+import moment from 'moment';
 
 const PaymentMethod = [gpay, dana, bca, bri, gopay, ovo, visa, paypal];
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required('First name is required'),
+  email: Yup.string()
+    .email('Must be a valid email address')
+    .required('Email is required'),
+  phone: Yup.string()
+    .min(9, 'Phone number must have at least 9 characters')
+    .required('Phone Number is required'),
+});
 
 class Payment extends Component {
   render() {
@@ -28,7 +47,7 @@ class Payment extends Component {
         <Wrapper space="20px">
           <RowSpaceBetween>
             <TotalLabel>Total Payment</TotalLabel>
-            <Text>$30.00</Text>
+            <Text>Rp.{this.props.results.pricePerSeat}.00</Text>
           </RowSpaceBetween>
         </Wrapper>
         <ContainerWrapper>
@@ -37,7 +56,10 @@ class Payment extends Component {
             <PaymentWrapper>
               {PaymentMethod.map((item) => {
                 return (
-                  <PaymentSelect style={{marginHorizontal: 5}} key={item}>
+                  <PaymentSelect
+                    onPress={() => this.props.setPaymentMethod(item)}
+                    style={{marginHorizontal: 5}}
+                    key={item}>
                     <Image style={{resizeMode: 'contain'}} source={item} />
                   </PaymentSelect>
                 );
@@ -58,30 +80,117 @@ class Payment extends Component {
             </HrWrape>
           </Wrapper>
         </ContainerWrapper>
-        <ContainerWrapper>
-          <Label>Personal Info</Label>
-          <Wrapper radius="16px" space="20px">
-            <InputTextStyle label="Full Name" placeholder="Write your name" />
-            <InputTextStyle label="Email" placeholder="Write your email" />
-            <InputTextStyle
-              label="Phone Number"
-              placeholder="Write your number"
-            />
-            <WarningWrapper>
-              <WarningIcon source={warning} />
-              <WarningText>Fill your data correctly.</WarningText>
-            </WarningWrapper>
-          </Wrapper>
-        </ContainerWrapper>
-        <ContainerWrapper>
-          <ButtonCheckout
-            onPress={() => this.props.navigation.navigate('Ticket')}
-            height={'40px'}
-            radius={'5px '}>
-            Checkout
-          </ButtonCheckout>
-        </ContainerWrapper>
+        <Formik
+          initialValues={{
+            name: '',
+            email: '',
+            phone: '',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={async () => {
+            this.props.setLoading();
+            try {
+              const response = await http(this.props.token).post(
+                'api/v1/transaction',
+                {
+                  movieId: this.props.results.movieId,
+                  cinemaId: this.props.results.cinemaId,
+                  timeId: this.props.results.timeId,
+                  showTimeId: this.props.results.showTimeId,
+                  seats: this.props.results.seats.join(', '),
+                  ticketDate: moment(this.props.results.showTimeDate).format(
+                    'YYYY-MM-DD',
+                  ),
+                  ticketTime: this.props.results.ticketTime,
+                  ticketCount: 1,
+                  movieTitle: this.props.results.movieTitle,
+                  cinemaName: this.props.results.cinemaName,
+                  cinemaPoster: this.props.results.picture,
+                  cinemaCity: this.props.results.cinemaCity,
+                  paymentMethod: this.props.results.paymentMethod,
+                  totalPayment: 40000,
+                },
+              );
+              showMessage({
+                message: response.data.message,
+                type: 'success',
+                duration: 3000,
+                hideOnPress: true,
+              });
+              this.props.navigation.navigate('Ticket');
+            } catch (error) {
+              console.log(error);
+            }
+          }}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            isValid,
+            touched,
+          }) => (
+            <>
+              <ContainerWrapper>
+                <Label>Personal Info</Label>
+                <Wrapper radius="16px" space="20px">
+                  <InputTextStyle
+                    label="Full Name"
+                    placeholder="Write Your Full Name"
+                    value={values.name}
+                    onChangeText={handleChange('name')}
+                    onBlur={handleBlur('name')}
+                  />
+                  {errors.name && touched.name ? (
+                    <TextError>{errors.name}</TextError>
+                  ) : null}
+                  <InputTextStyle
+                    label="Email"
+                    placeholder="Write your email"
+                    autoCompleteType="email"
+                    keyboardType="email-address"
+                    textContentType="emailAddress"
+                    value={values.email}
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                  />
+                  {errors.email && touched.email ? (
+                    <TextError>{errors.email}</TextError>
+                  ) : null}
+                  <InputPhoneStyle
+                    label="Phone Number"
+                    placeholder="Write Your Number"
+                    value={values.phone}
+                    onChangeText={handleChange('phone')}
+                    onBlur={handleBlur('phone')}
+                  />
+                  {errors.phone ? <TextError>{errors.phone}</TextError> : null}
+                  <WarningWrapper>
+                    <WarningIcon source={warning} />
+                    <WarningText>Fill your data correctly.</WarningText>
+                  </WarningWrapper>
+                </Wrapper>
+              </ContainerWrapper>
+              <ContainerWrapper>
+                <ButtonCheckout
+                  height={'40px'}
+                  radius={'5px '}
+                  onPress={handleSubmit}
+                  disabled={!isValid}
+                  color={
+                    !isValid || values.name === '' || values.phone === ''
+                      ? '#D8CCFA'
+                      : null
+                  }>
+                  Checkout
+                </ButtonCheckout>
+              </ContainerWrapper>
+            </>
+          )}
+        </Formik>
         <Footer />
+        <Loading />
       </Container>
     );
   }
@@ -92,6 +201,9 @@ const Container = styled.ScrollView`
 `;
 const ContainerWrapper = styled.View`
   padding: 20px;
+`;
+const InputPhoneStyle = styled(InputPhone)`
+  margin-bottom: 10px;
 `;
 const Wrapper = styled.View`
   background-color: #fff;
@@ -158,7 +270,11 @@ const Image = styled.Image`
   height: 25px;
   width: 50px;
 `;
-
+const TextError = styled.Text`
+  font-family: Mulish-Medium;
+  font-size: 12px;
+  color: red;
+`;
 const Hr = styled.View`
   border: 0.5px #aaaa;
   height: 0.5px;
@@ -177,4 +293,14 @@ const OrText = styled.Text`
 const ManulPayment = styled(OrText)`
   color: #5f2eea;
 `;
-export default Payment;
+
+const mapStateToProps = (state) => {
+  return {
+    token: state.auth.token,
+    results: state.order,
+  };
+};
+
+const mapDispatchToProps = {setPersonalInfo, setPaymentMethod, setLoading};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Payment);
