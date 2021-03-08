@@ -1,6 +1,13 @@
 export {default as Header} from './Header';
 export {default as Button} from './Button';
 export {default as Separator} from './Separator';
+export {default as ProfileHeader} from './ProfileHeader';
+export * from './OrderHistoryContent';
 export {default as CardOrderHistory} from './Card/OrderHistory';
 export {default as Loading} from './Loading';
+export {default as SimpleCard} from './SimpleCard';
+export {default as MiniLoading} from './MiniLoading';
+export {default as MiniMessage} from './MiniMessage';
+export {default as CardViewAll} from './CardViewAll';
+export {default as ViewAll} from './ViewAll';
 export {default as Footer} from './Footer';

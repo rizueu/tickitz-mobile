@@ -10,6 +10,7 @@ import moviesReducer from './movies';
 import showtimesReducer from './showtimes';
 import orderReducer from './order';
 import userReducer from './user';
+import loading from './loading';
 
 const rootPersistConfig = {
   key: 'root',
@@ -35,6 +36,7 @@ const rootReducer = combineReducers({
   showtimes: showtimesReducer,
   order: orderReducer,
   user: persistReducer(userPersistConfig, userReducer),
+  loading: loading,
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

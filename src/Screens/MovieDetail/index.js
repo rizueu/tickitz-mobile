@@ -20,12 +20,7 @@ import {connect} from 'react-redux';
 import {getMovieById} from '../../Redux/actions/movies';
 import {getShowtimes} from '../../Redux/actions/showtimes';
 import {setLoading} from '../../Redux/actions/main';
-import {
-  selectTime,
-  setOrder,
-  setTotalPayment,
-  setTicketCount,
-} from '../../Redux/actions/order';
+import {selectTime, setOrder} from '../../Redux/actions/order';
 
 import {Ebv, Cineone, Hiflix} from '../../Assets/Images/Cinemas';
 import {Button, Footer} from '../../Components';
@@ -44,6 +39,7 @@ export class MovieDetail extends Component {
       showTimeId: null,
       timeChoosed: null,
     };
+    this.handleOrder = this.handleOrder.bind(this);
   }
 
   showDatePicker = () => {
@@ -96,8 +92,6 @@ export class MovieDetail extends Component {
   handleOrder(index) {
     this.props.showtimes[index].timeId = this.state.timeId;
     this.props.showtimes[index].showTimeId = this.state.showTimeId;
-    this.props.setTicketCount();
-    this.props.setTotalPayment();
     this.props.setOrder(this.props.showtimes[index]);
     this.props.navigation.navigate('Order', {
       showTimeId: this.state.showTimeId,
@@ -236,7 +230,9 @@ export class MovieDetail extends Component {
                                       : null
                                   }
                                   onPress={() => {
-                                    selectTime(timesElement.showTime);
+                                    this.props.selectTime(
+                                      timesElement.showTime,
+                                    );
                                     this.setState({
                                       timeChoosed: index,
                                     });
@@ -338,8 +334,6 @@ const mapDispatchToProps = {
   setLoading,
   selectTime,
   setOrder,
-  setTotalPayment,
-  setTicketCount,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MovieDetail);

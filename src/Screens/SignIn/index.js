@@ -16,12 +16,13 @@ import {useNavigation} from '@react-navigation/native';
 import {Button, Separator, Loading} from '../../Components';
 import {useSelector, useDispatch} from 'react-redux';
 
-import {login} from '../../Redux/actions/auth';
+import {login, setNullError} from '../../Redux/actions/auth';
 import {setLoading} from '../../Redux/actions/main';
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const SignIn = () => {
+  const errorMsg = useSelector((state) => state.auth.errorMsg);
   const [peekPassword, setPeekPassword] = useState(true);
   // const error = useSelector((state) => state.auth.errorMsg);
 
@@ -45,11 +46,45 @@ const SignIn = () => {
       .required('Password is required'),
   });
 
-  const submitHandler = (body) => {
+  const checkError = async () => {
+    if (errorMsg) {
+      setTimeout(() => {
+        showMessage({
+          message: errorMsg,
+          type: 'danger',
+          duration: 3000,
+          hideOnPress: true,
+        });
+        dispatch(setLoading());
+      }, 3000);
+      dispatch(setNullError());
+    } else {
+      setTimeout(() => {
+        showMessage({
+          message: 'Successfuly Sign In.',
+          type: 'success',
+          duration: 3000,
+          hideOnPress: true,
+        });
+        navigation.navigate('Home');
+      }, 3000);
+    }
+  };
+
+  const submitHandler = async (body) => {
     const {email, password} = body;
     dispatch(setLoading());
-    dispatch(login(email, password));
-    setTimeout(() => {
+    await dispatch(login(email, password));
+    if (errorMsg) {
+      showMessage({
+        message: errorMsg,
+        type: 'danger',
+        duration: 3000,
+        hideOnPress: true,
+      });
+      dispatch(setLoading());
+      dispatch(setNullError());
+    } else {
       showMessage({
         message: 'Successfuly Sign In.',
         type: 'success',
@@ -57,7 +92,7 @@ const SignIn = () => {
         hideOnPress: true,
       });
       navigation.navigate('Home');
-    }, 3000);
+    }
   };
 
   return (

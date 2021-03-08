@@ -6,10 +6,24 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import RNBootSplash from 'react-native-bootsplash';
 import FlashMessage from 'react-native-flash-message';
+import PushNotification from 'react-native-push-notification';
 
 import persistedStore from './Redux/store';
 
 const Stack = createStackNavigator();
+
+PushNotification.createChannel(
+  {
+    channelId: 'general',
+    channelName: 'General Notification',
+    channelDescription: 'A channel to categorise your notifications',
+    playSound: false,
+    soundName: 'default',
+    importance: 4,
+    vibrate: true,
+  },
+  (created) => console.log(`createChannel returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
+);
 
 import {Header} from './Components';
 import {
@@ -23,6 +37,7 @@ import {
   Ticket,
   Profile,
   OrderHistory,
+  ViewAll,
 } from './Screens';
 
 export default function App() {
@@ -102,8 +117,8 @@ export default function App() {
               }}
             />
             <Stack.Screen
-              component={OrderHistory}
-              name="OrderHistory"
+              component={ViewAll}
+              name="ViewAll"
               options={{
                 header: () => <Header />,
               }}

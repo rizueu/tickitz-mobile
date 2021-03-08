@@ -330,7 +330,11 @@ const Order = (props) => {
           </Button>
         </Card>
         <Button
-          onPress={() => props.navigation.navigate('Payment')}
+          onPress={() => {
+            dispatch(setTicketCount());
+            dispatch(setTotalPayment());
+            props.navigation.navigate('Payment');
+          }}
           style={{paddingVertical: 15, marginVertical: 20}}
           variant="primary">
           <Text white>Checkout now</Text>

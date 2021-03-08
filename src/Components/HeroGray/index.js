@@ -1,13 +1,15 @@
 import React, {Fragment} from 'react';
 import {View, StyleSheet} from 'react-native';
 
-export default (props) => {
+const HeroGray = (props) => {
   return (
     <Fragment>
       <View style={styled.hero}>{props.children}</View>
     </Fragment>
   );
 };
+
+export default HeroGray;
 
 const styled = StyleSheet.compose({
   hero: {

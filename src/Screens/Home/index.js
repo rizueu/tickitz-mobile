@@ -7,6 +7,7 @@ import {
   Image,
   ActivityIndicator,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -72,9 +73,11 @@ function Home(props) {
               <Text style={{fontSize: 20, marginBottom: 25}} heavy primary>
                 Now Showing
               </Text>
-              <Text style={{fontSize: 15}} primary>
-                view all
-              </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('ViewAll')}>
+                <Text style={{fontSize: 15}} primary>
+                  view all
+                </Text>
+              </TouchableOpacity>
             </View>
             <ScrollView
               showsHorizontalScrollIndicator={false}
@@ -112,9 +115,11 @@ function Home(props) {
             <Text style={{fontSize: 20, marginBottom: 25}} heavy primary>
               Upcoming Movies
             </Text>
-            <Text style={{fontSize: 15}} primary>
-              view all
-            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('ViewAll')}>
+              <Text style={{fontSize: 15}} primary>
+                view all
+              </Text>
+            </TouchableOpacity>
           </View>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             {[

@@ -5,16 +5,19 @@ import {
   Text,
   TouchableWithoutFeedback,
 } from 'react-native';
+import {REACT_APP_API_URL} from '@env';
 import {connect} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import styled from 'styled-components';
 import jwt_decode from 'jwt-decode';
+import http from '../../Services';
 
 import MenuBar from '../../Assets/Icons/nav-bars.png';
 import PrimaryLogo from '../../Assets/Icons/Tickitz_Primary.png';
 
 const Header = (props) => {
   const [avatarCollapse, setAvatarCollapse] = useState(false);
+  const [picture, setPicture] = useState(null);
 
   const navigation = useNavigation();
 
@@ -30,6 +33,18 @@ const Header = (props) => {
     setAvatarCollapse((initial) => !initial);
   };
 
+  React.useEffect(() => {
+    const User = async () => {
+      try {
+        const {data} = await http.getUserDetail(props.token, decodedToken.id);
+        setPicture(data.results.picture);
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+    User();
+  }, []);
+
   return (
     <Navbar>
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
@@ -43,7 +58,7 @@ const Header = (props) => {
           onPress={() => navigation.navigate('Profile')}>
           <Avatar
             source={{
-              uri: decodedToken.picture,
+              uri: `${REACT_APP_API_URL}profile/${picture}`,
             }}
           />
         </TouchableWithoutFeedback>

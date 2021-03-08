@@ -29,3 +29,18 @@ export const reset_token = () => {
     });
   };
 };
+
+export const refresh = () => {
+  return {
+    type: 'SET_REFRESH',
+  };
+};
+
+export const setNullError = () => {
+  return async (dispatch) => {
+    dispatch({
+      type: 'SET_NULL_ERROR',
+      errorMsg: null,
+    });
+  };
+};

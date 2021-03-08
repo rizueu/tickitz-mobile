@@ -16,10 +16,13 @@ export const setOrder = (data) => {
   };
 };
 
-export const selectTime = (time) => ({
-  type: 'SELECT_TIME',
-  time,
-});
+export const selectTime = (time) => {
+  console.log('SELECTED TIME', time);
+  return {
+    type: 'SELECT_TIME',
+    time,
+  };
+};
 
 export const selectSeat = (seats) => ({
   type: 'SELECT_SEAT',
@@ -30,13 +33,19 @@ export const removeSeat = () => ({
   type: 'REMOVE_SEAT',
 });
 
-export const setTicketCount = () => ({
-  type: 'SET_TICKET_COUNT',
-});
+export const setTicketCount = () => {
+  console.log('TICKET COUNT BERJALAN');
+  return {
+    type: 'SET_TICKET_COUNT',
+  };
+};
 
-export const setTotalPayment = () => ({
-  type: 'SET_TOTAL_PAYMENT',
-});
+export const setTotalPayment = () => {
+  console.log('Total Payment BERJALAN');
+  return {
+    type: 'SET_TOTAL_PAYMENT',
+  };
+};
 
 export const setPaymentMethod = (paymentMethod) => ({
   type: 'SET_PAYMENT_METHOD',

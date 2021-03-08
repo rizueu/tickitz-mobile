@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 import {showMessage} from 'react-native-flash-message';
 import Button from '../../component/Button';
 import {InputText, InputPhone} from '../../component/Form';
+import PushNotification from 'react-native-push-notification';
 
 import {connect} from 'react-redux';
 import {setPersonalInfo, setPaymentMethod} from '../../Redux/actions/order';
@@ -102,20 +103,26 @@ class Payment extends Component {
                     'YYYY-MM-DD',
                   ),
                   ticketTime: this.props.results.ticketTime,
-                  ticketCount: 1,
+                  ticketCount: this.props.results.ticketCount,
                   movieTitle: this.props.results.movieTitle,
                   cinemaName: this.props.results.cinemaName,
                   cinemaPoster: this.props.results.picture,
                   cinemaCity: this.props.results.cinemaCity,
                   paymentMethod: this.props.results.paymentMethod,
-                  totalPayment: 40000,
+                  totalPayment: this.props.results.totalPayment,
                 },
               );
+              this.props.setLoading();
               showMessage({
                 message: response.data.message,
                 type: 'success',
                 duration: 3000,
                 hideOnPress: true,
+              });
+              PushNotification.localNotification({
+                channelId: 'general',
+                title: 'Ticket Notification',
+                message: 'Thanks, Successfully to order a ticket',
               });
               this.props.navigation.navigate('Ticket');
             } catch (error) {

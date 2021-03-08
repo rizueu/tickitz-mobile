@@ -45,6 +45,7 @@ const orderReducer = (state = initialState, action) => {
     }
 
     case 'SELECT_TIME': {
+      console.log('INI TICKETTIME', action.time);
       return {
         ...state,
         ticketTime: action.time,
@@ -75,7 +76,7 @@ const orderReducer = (state = initialState, action) => {
     case 'SET_TOTAL_PAYMENT': {
       return {
         ...state,
-        totalPayment: state.ticketCount * state.pricePerSeat,
+        totalPayment: state.ticketCount * Number(state.pricePerSeat),
       };
     }
 

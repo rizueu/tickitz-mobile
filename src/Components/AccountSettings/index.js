@@ -1,66 +1,138 @@
 import React, {Component, Fragment} from 'react';
 import {View, Text, StyleSheet, Dimensions} from 'react-native';
 import {connect} from 'react-redux';
-import http from '../../Helpers/http';
+import http from '../../Services';
 import {showMessage} from 'react-native-flash-message';
 import append from '../../Helpers/append';
 import jwtdecode from 'jwt-decode';
 
 // import actions
-import {setUserDetail, setInputUser, refresh} from '../../Redux/actions/auth';
+import {refresh, reset_token} from '../../Redux/actions/auth';
 import loading from '../../Redux/actions/loading';
 
 // import all components
 import {SimpleCard} from '../';
-import TextField from '../text-field/TextField';
-import PhoneField from '../phone-field/PhoneField';
-import PasswordField from '../password-field/PasswordField';
+import TextField from '../TextField';
+import PhoneField from '../PhoneField';
+import PasswordField from '../PasswordField';
 import Button from '../button/Button';
-
 class AccountSettingsComponent extends Component {
-  state = {
-    password: null,
-    passwordConfirm: null,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      password: null,
+      passwordConfirm: null,
+      fullName: null,
+      email: null,
+      phoneNumber: null,
+    };
+  }
 
-  handleInput = (name, value) => {
-    this.props.setInputUser(name, value);
-  };
-
-  handleInputText = (name, value) => {
-    this.setState({
-      [name]: value,
-    });
-  };
-
-  editProfile = async () => {
-    this.props.loading();
-    const formData = new FormData();
-    append(formData, {
-      first_name: this.props.fullName ? this.props.fullName.split(' ')[0] : '',
-      last_name: this.props.fullName ? this.props.fullName.split(' ')[1] : '',
-      phone: this.props.phoneNumber,
-      email: this.props.email,
-    });
+  fetchData = async () => {
+    const {id} = jwtdecode(this.props.token);
     try {
-      const {data} = await http.editUserDetail(this.props.token, formData);
-      this.props.loading();
-      showMessage({
-        message: data.message,
-        type: 'success',
-        duration: 2000,
-        hideOnPress: true,
+      const {data} = await http.getUserDetail(this.props.token, id);
+      this.setState({
+        fullName:
+          data.results.firstName &&
+          `${data.results.firstName}${
+            String(data.results.lastName) !== 'undefined'
+              ? ` ${data.results.lastName}`
+              : ''
+          }`,
+        email: data.results.email,
+        phoneNumber: data.results.phone,
       });
-      this.props.refresh();
     } catch (err) {
-      console.log(err.response.data);
-      this.props.loading();
+      console.log(err);
       showMessage({
         message: err.response.data.message,
         type: 'warning',
         duration: 2000,
         hideOnPress: true,
       });
+    }
+  };
+
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.isRefresh !== prevProps.isRefresh) {
+      this.fetchData();
+    }
+  }
+
+  handleInput = (name, value) => {
+    this.setState({
+      [name]: value,
+    });
+  };
+
+  editProfile = async () => {
+    const email = this.state.email.match(/[^@$a-z0-9.]/gi);
+    if (!this.state.fullName || !this.state.phoneNumber || !this.state.email) {
+      showMessage({
+        message: "Form can't be empty",
+        type: 'warning',
+        duration: 2000,
+        hideOnPress: true,
+      });
+    } else if (
+      email ||
+      !this.state.email.match(/@\b/g) ||
+      this.state.email.match(/\s/) ||
+      this.state.email.match(/\b[0-9]/) ||
+      !this.state.email.split('@').pop().includes('.')
+    ) {
+      showMessage({
+        message: 'Incorect email',
+        type: 'warning',
+        duration: 2000,
+        hideOnPress: true,
+      });
+    } else if (this.state.phoneNumber.match(/[^0-9]/gi) !== null) {
+      showMessage({
+        message: 'Incorect phone number',
+        type: 'warning',
+        duration: 2000,
+        hideOnPress: true,
+      });
+    } else {
+      this.props.loading();
+      const formData = new FormData();
+      append(formData, {
+        firstName: this.state.fullName ? this.state.fullName.split(' ')[0] : '',
+        lastName: this.state.fullName ? this.state.fullName.split(' ')[1] : '',
+        phone: this.state.phoneNumber,
+        email: this.state.email,
+      });
+      try {
+        const {id} = jwtdecode(this.props.token);
+        const {data} = await http.editUserDetail(
+          this.props.token,
+          id,
+          formData,
+        );
+        this.props.loading();
+        showMessage({
+          message: data.message,
+          type: 'success',
+          duration: 2000,
+          hideOnPress: true,
+        });
+        this.props.refresh();
+      } catch (err) {
+        console.log(err.response.data);
+        this.props.loading();
+        showMessage({
+          message: err.response.data.message,
+          type: 'warning',
+          duration: 2000,
+          hideOnPress: true,
+        });
+      }
     }
   };
 
@@ -89,12 +161,7 @@ class AccountSettingsComponent extends Component {
         duration: 2000,
         hideOnPress: true,
       });
-    } else if (
-      this.state.password.match(/[a-z]/g) === null ||
-      this.state.password.match(/\d/g) === null ||
-      this.state.password.match(/[A-Z]/g) === null ||
-      this.state.password.match(/[^a-z0-9]/gi) === null
-    ) {
+    } else if (this.state.password.match(/[A-Z]/g) === null) {
       showMessage({
         message:
           'Password must include lower case and uppercase letters, numbers and symbol',
@@ -112,7 +179,7 @@ class AccountSettingsComponent extends Component {
         const {data} = await http.resetPassword(
           formData,
           jwtdecode(this.props.token).id,
-          this.props.email,
+          this.state.email,
         );
         this.props.loading();
         showMessage({
@@ -155,7 +222,7 @@ class AccountSettingsComponent extends Component {
                         placeholder="Write Your Full Name"
                         placeholderColor="#A0A3BD"
                         height="50px"
-                        value={this.props.fullName}
+                        value={this.state.fullName}
                         onChangeText={(value) =>
                           this.handleInput('fullName', value)
                         }
@@ -172,7 +239,7 @@ class AccountSettingsComponent extends Component {
                         placeholderColor="#A0A3BD"
                         height="50px"
                         keyboardType="email-address"
-                        value={this.props.email}
+                        value={this.state.email}
                         onChangeText={(value) =>
                           this.handleInput('email', value)
                         }
@@ -188,7 +255,7 @@ class AccountSettingsComponent extends Component {
                         placeholder="Write Your Phone Number"
                         placeholderColor="#A0A3BD"
                         height={50}
-                        value={this.props.phoneNumber}
+                        value={this.state.phoneNumber}
                         onChangeText={(value) =>
                           this.handleInput('phoneNumber', value)
                         }
@@ -224,7 +291,7 @@ class AccountSettingsComponent extends Component {
                     placeholderTextColor="#A0A3BD"
                     placeholder="Write your password"
                     onChangeText={(value) =>
-                      this.handleInputText('password', value)
+                      this.handleInput('password', value)
                     }
                   />
                 </View>
@@ -238,7 +305,7 @@ class AccountSettingsComponent extends Component {
                     placeholderTextColor="#A0A3BD"
                     placeholder="Write your password"
                     onChangeText={(value) =>
-                      this.handleInputText('passwordConfirm', value)
+                      this.handleInput('passwordConfirm', value)
                     }
                   />
                 </View>
@@ -252,6 +319,15 @@ class AccountSettingsComponent extends Component {
                   Update Changes
                 </Button>
               </View>
+              <Button
+                height="55px"
+                width="100%"
+                onPress={() => {
+                  this.props.reset_token();
+                  this.props.navigation.navigate('SignIn');
+                }}>
+                Logout
+              </Button>
             </View>
           </SimpleCard>
         </View>
@@ -265,10 +341,9 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = {
-  setUserDetail,
   loading,
-  setInputUser,
   refresh,
+  reset_token,
 };
 
 const AccountSettings = connect(

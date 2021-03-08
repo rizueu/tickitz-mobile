@@ -20,6 +20,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setLoading} from '../../Redux/actions/main';
 
 const SignUp = (props) => {
+  const token = useSelector((state) => state.auth.token);
   const [peekPassword, setPeekPassword] = useState(true);
   const [error, setError] = useState(null);
 
@@ -63,6 +64,12 @@ const SignUp = (props) => {
       setError(error.response.data.message);
     }
   };
+
+  React.useEffect(() => {
+    if (token) {
+      navigation.navigate('Home');
+    }
+  }, [token, navigation]);
 
   return (
     <ScrollView style={{backgroundColor: '#fff'}}>
