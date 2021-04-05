@@ -28,6 +28,7 @@ const moviesReducer = (state = initialState, action) => {
     case 'ERROR_MESSAGE': {
       return {
         ...state,
+        upComingMovies: [],
         error: action.error,
       };
     }

@@ -39,6 +39,7 @@ import {
   OrderHistory,
   ViewAll,
 } from './Screens';
+import linking from './linking';
 
 export default function App() {
   const {persistor, store} = persistedStore();
@@ -50,7 +51,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-        <NavigationContainer>
+        <NavigationContainer linking={linking}>
           <StatusBar barStyle="light-content" />
           <Stack.Navigator>
             <Stack.Screen

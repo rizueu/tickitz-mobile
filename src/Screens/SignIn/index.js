@@ -11,6 +11,8 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
 import {showMessage} from 'react-native-flash-message';
+import {useRoute} from '@react-navigation/native';
+import http from '../../Services';
 
 import {useNavigation} from '@react-navigation/native';
 import {Button, Separator, Loading} from '../../Components';
@@ -23,6 +25,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const SignIn = () => {
   const errorMsg = useSelector((state) => state.auth.errorMsg);
+  const route = useRoute();
   const [peekPassword, setPeekPassword] = useState(true);
   // const error = useSelector((state) => state.auth.errorMsg);
 
@@ -75,25 +78,50 @@ const SignIn = () => {
     const {email, password} = body;
     dispatch(setLoading());
     await dispatch(login(email, password));
-    if (errorMsg) {
-      showMessage({
-        message: errorMsg,
-        type: 'danger',
-        duration: 3000,
-        hideOnPress: true,
-      });
-      dispatch(setLoading());
-      dispatch(setNullError());
-    } else {
-      showMessage({
-        message: 'Successfuly Sign In.',
-        type: 'success',
-        duration: 3000,
-        hideOnPress: true,
-      });
-      navigation.navigate('Home');
-    }
+    setTimeout(() => {
+      if (errorMsg) {
+        showMessage({
+          message: errorMsg,
+          type: 'danger',
+          duration: 3000,
+          hideOnPress: true,
+        });
+        dispatch(setLoading());
+        dispatch(setNullError());
+      } else {
+        showMessage({
+          message: 'Successfuly Sign In.',
+          type: 'success',
+          duration: 3000,
+          hideOnPress: true,
+        });
+        navigation.navigate('Home');
+      }
+    }, 0);
   };
+
+  React.useEffect(() => {
+    if (typeof route.params === 'object') {
+      const id = new URLSearchParams();
+      id.append('id', route.params.id);
+      try {
+        const {data} = http.activeAccount(id);
+        showMessage({
+          message: data.message,
+          type: 'success',
+          duration: 2000,
+          hideOnPress: true,
+        });
+      } catch (error) {
+        showMessage({
+          message: 'Invalid Request',
+          type: 'danger',
+          duration: 2000,
+          hideOnPress: true,
+        });
+      }
+    }
+  }, [route.params]);
 
   return (
     <ScrollView style={{backgroundColor: '#fff'}}>

@@ -50,7 +50,7 @@ const SignUp = (props) => {
     credentials.append('password', body.password);
     dispatch(setLoading());
     try {
-      const response = await http().post('auth/register', credentials);
+      const response = await http().post('auth/register?v=Mobile', credentials);
       dispatch(setLoading());
       showMessage({
         message: response.data.message,

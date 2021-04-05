@@ -17,18 +17,22 @@ import {Button, Footer} from '../../Components';
 
 import {useSelector, useDispatch} from 'react-redux';
 import {getNowShowing, getUpComing} from '../../Redux/actions/movies';
-import {setLoading} from '../../Redux/actions/main';
+// import {setLoading} from '../../Redux/actions/main';
 
 function Home(props) {
   const token = useSelector((state) => state.auth.token);
-  const loading = useSelector((state) => state.main.loading);
+  // const loading = useSelector((state) => state.main.loading);
+  const [loading, setLoading] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState('September');
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const movies = useSelector((state) => state.movies);
-  const {nowShowingMovies, upComingMovies} = movies;
+  const nowShowingMovies = useSelector(
+    (state) => state.movies.nowShowingMovies,
+  );
+  const upComingMovies = useSelector((state) => state.movies.upComingMovies);
+  // const {nowShowingMovies, upComingMovies} = movies;
 
   React.useEffect(() => {
     if (!token) {
@@ -141,7 +145,7 @@ function Home(props) {
                   {element === selectedSeason ? (
                     <Button
                       onPress={() => {
-                        dispatch(setLoading(false));
+                        setLoading(false);
                       }}
                       style={styles.UpcomingButton}
                       variant="primary">
@@ -150,9 +154,9 @@ function Home(props) {
                   ) : (
                     <Button
                       onPress={() => {
-                        dispatch(setLoading(true));
+                        setLoading(true);
                         setSelectedSeason(element);
-                        setTimeout(() => dispatch(setLoading(false)), 1000);
+                        setTimeout(() => setLoading(false), 1000);
                       }}
                       style={styles.UpcomingButton}
                       variant="outlined-primary">

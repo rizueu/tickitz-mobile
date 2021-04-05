@@ -43,7 +43,7 @@ const Header = (props) => {
       }
     };
     User();
-  }, []);
+  }, [picture]);
 
   return (
     <Navbar>

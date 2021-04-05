@@ -323,8 +323,8 @@ class AccountSettingsComponent extends Component {
                 height="55px"
                 width="100%"
                 onPress={() => {
-                  this.props.reset_token();
                   this.props.navigation.navigate('SignIn');
+                  this.props.reset_token();
                 }}>
                 Logout
               </Button>

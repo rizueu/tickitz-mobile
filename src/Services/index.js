@@ -5,8 +5,8 @@ class Services {
     return http(null).get(`api/v1/movies/${id}`);
   }
 
-  activeAccount() {
-    return http(null).patch('auth/activate');
+  activeAccount(data) {
+    return http(null).patch('auth/activate', data);
   }
 
   sendForgotPasswordLink(id, email) {
