@@ -44,7 +44,6 @@ export default function ProfileHeader() {
         includeBase64: false,
       },
       async (response) => {
-        console.log('JANCUKKK!!', response);
         if (response.uri) {
           if (response.fileSize > 3000000) {
             setVisible(!isVisible);
