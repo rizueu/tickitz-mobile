@@ -43,11 +43,12 @@ const Header = (props) => {
       }
     };
     User();
-  }, [picture]);
+  }, []);
 
   return (
     <Navbar>
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+      <TouchableOpacity
+        onPress={() => (props.auth ? '' : navigation.navigate('Home'))}>
         <Image
           style={{resizeMode: 'contain', width: 120, height: 40}}
           source={PrimaryLogo}

@@ -6,12 +6,14 @@ export const login = (email, password) => {
     credentials.append('email', email);
     credentials.append('password', password);
     try {
-      const response = await http().post('auth/login', credentials);
+      const {data} = await http().post('auth/login', credentials);
+      console.log(data.results);
       dispatch({
         type: 'LOGIN',
-        token: response.data.results.token,
+        token: data.results.token,
       });
     } catch (error) {
+      console.log(error.response.data.message);
       dispatch({
         type: 'SET_ERROR',
         errorMsg: error.response.data.message,
@@ -22,6 +24,7 @@ export const login = (email, password) => {
 
 export const reset_token = () => {
   return async (dispatch) => {
+    console.log('LOGOUT JALAN');
     dispatch({
       type: 'LOGOUT',
       token: null,

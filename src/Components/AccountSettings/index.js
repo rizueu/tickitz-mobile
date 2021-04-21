@@ -1,6 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import {View, Text, StyleSheet, Dimensions} from 'react-native';
-import {connect} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
+import {connect, useDispatch} from 'react-redux';
 import http from '../../Services';
 import {showMessage} from 'react-native-flash-message';
 import append from '../../Helpers/append';
@@ -16,6 +17,22 @@ import TextField from '../TextField';
 import PhoneField from '../PhoneField';
 import PasswordField from '../PasswordField';
 import Button from '../button/Button';
+
+const Logout = () => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  return (
+    <Button
+      height="55px"
+      width="100%"
+      onPress={() => {
+        dispatch(reset_token());
+        navigation.navigate('SignIn');
+      }}>
+      Logout
+    </Button>
+  );
+};
 class AccountSettingsComponent extends Component {
   constructor(props) {
     super(props);
@@ -319,15 +336,16 @@ class AccountSettingsComponent extends Component {
                   Update Changes
                 </Button>
               </View>
-              <Button
+              <Logout />
+              {/* <Button
                 height="55px"
                 width="100%"
                 onPress={() => {
-                  this.props.navigation.navigate('SignIn');
+                  navigate('SignIn');
                   this.props.reset_token();
                 }}>
                 Logout
-              </Button>
+              </Button> */}
             </View>
           </SimpleCard>
         </View>

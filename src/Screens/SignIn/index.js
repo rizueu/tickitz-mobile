@@ -25,6 +25,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const SignIn = () => {
   const errorMsg = useSelector((state) => state.auth.errorMsg);
+  const token = useSelector((state) => state.auth.token);
   const route = useRoute();
   const [peekPassword, setPeekPassword] = useState(true);
   // const error = useSelector((state) => state.auth.errorMsg);
@@ -49,56 +50,31 @@ const SignIn = () => {
       .required('Password is required'),
   });
 
-  const checkError = async () => {
-    if (errorMsg) {
-      setTimeout(() => {
-        showMessage({
-          message: errorMsg,
-          type: 'danger',
-          duration: 3000,
-          hideOnPress: true,
-        });
-        dispatch(setLoading());
-      }, 3000);
-      dispatch(setNullError());
-    } else {
-      setTimeout(() => {
-        showMessage({
-          message: 'Successfuly Sign In.',
-          type: 'success',
-          duration: 3000,
-          hideOnPress: true,
-        });
-        navigation.navigate('Home');
-      }, 3000);
-    }
-  };
-
   const submitHandler = async (body) => {
     const {email, password} = body;
     dispatch(setLoading());
-    await dispatch(login(email, password));
-    setTimeout(() => {
-      if (errorMsg) {
-        showMessage({
-          message: errorMsg,
-          type: 'danger',
-          duration: 3000,
-          hideOnPress: true,
-        });
-        dispatch(setLoading());
-        dispatch(setNullError());
-      } else {
-        showMessage({
-          message: 'Successfuly Sign In.',
-          type: 'success',
-          duration: 3000,
-          hideOnPress: true,
-        });
-        navigation.navigate('Home');
-      }
-    }, 0);
+    dispatch(login(email, password));
   };
+
+  React.useEffect(() => {
+    if (token) {
+      dispatch(setLoading());
+      navigation.navigate('Home');
+    }
+  }, [token]);
+
+  React.useEffect(() => {
+    if (errorMsg) {
+      showMessage({
+        message: errorMsg,
+        type: 'danger',
+        duration: 2000,
+        hideOnPress: true,
+      });
+      dispatch(setLoading());
+      dispatch(setNullError());
+    }
+  }, [errorMsg]);
 
   React.useEffect(() => {
     if (typeof route.params === 'object') {

@@ -20,7 +20,6 @@ import {getNowShowing, getUpComing} from '../../Redux/actions/movies';
 // import {setLoading} from '../../Redux/actions/main';
 
 function Home(props) {
-  const token = useSelector((state) => state.auth.token);
   // const loading = useSelector((state) => state.main.loading);
   const [loading, setLoading] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState('September');
@@ -32,13 +31,6 @@ function Home(props) {
     (state) => state.movies.nowShowingMovies,
   );
   const upComingMovies = useSelector((state) => state.movies.upComingMovies);
-  // const {nowShowingMovies, upComingMovies} = movies;
-
-  React.useEffect(() => {
-    if (!token) {
-      navigation.navigate('SignUp');
-    }
-  }, [token, navigation]);
 
   React.useEffect(() => {
     dispatch(getNowShowing(moment().format('MMMM')));
